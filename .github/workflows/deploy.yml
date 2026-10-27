@@ -1,0 +1,118 @@
+name: CD — Deploy Deadlock Portal
+
+on:
+  workflow_run:
+    workflows: ["CI — Validate portal"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deadlock-portal-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Univates VM
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')
+    timeout-minutes: 15
+    steps:
+      - name: Check SSH secrets
+        id: config
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          if [[ -z "$VM_HOST" || -z "$VM_USER" || -z "$SSH_KEY" || -z "$KNOWN_HOSTS" ]]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::Deploy skipped: SSH secrets are not yet configured for this repository.'
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure SSH
+        if: steps.config.outputs.ready == 'true'
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_PORT: ${{ secrets.VM_PORT }}
+          SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          set -Eeuo pipefail
+          port="${VM_PORT:-22}"
+          if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65535 )); then
+            echo '::error::VM_PORT must be a valid TCP port'
+            exit 1
+          fi
+
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$KNOWN_HOSTS" | tr -d '\r' > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null || {
+            echo '::error::VM_SSH_KEY is not a valid private key'
+            exit 1
+          }
+          host_lookup="$VM_HOST"
+          [[ "$port" == 22 ]] || host_lookup="[$VM_HOST]:$port"
+          ssh-keygen -F "$host_lookup" -f "$HOME/.ssh/known_hosts" >/dev/null || {
+            echo '::error::Host key not found in VM_KNOWN_HOSTS for the configured SSH port'
+            exit 1
+          }
+
+      - name: Update VM and restart container
+        if: steps.config.outputs.ready == 'true'
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          VM_PORT: ${{ secrets.VM_PORT }}
+        run: |
+          set -Eeuo pipefail
+          ssh \
+            -i "$HOME/.ssh/id_ed25519" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o PreferredAuthentications=publickey \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            -o ConnectTimeout=15 \
+            -o ConnectionAttempts=1 \
+            -p "${VM_PORT:-22}" \
+            "${VM_USER}@${VM_HOST}" 'bash -se' <<'REMOTE'
+          set -Eeuo pipefail
+
+          cd "$HOME/deadlock-portal" || {
+            echo '::error::Missing ~/deadlock-portal; clone the repository on the VM first.'
+            exit 1
+          }
+          [[ -d .git ]] || { echo '::error::Deployment path is not a Git repository.'; exit 1; }
+
+          echo '::group::Update repository'
+          git checkout main
+          git pull --ff-only origin main
+          echo "Revision: $(git rev-parse --short HEAD)"
+          echo '::endgroup::'
+
+          echo '::group::Deploy container'
+          sudo -n docker compose config --quiet
+          sudo -n docker compose up -d --build --wait
+          sudo -n docker compose ps
+          echo '::endgroup::'
+
+          echo '::group::HTTP health check'
+          curl -fsS --retry 5 --retry-delay 2 --retry-connrefused --max-time 10 \
+            http://127.0.0.1:8081/health | grep -qx 'ok'
+          echo 'HTTP health check passed.'
+          echo '::endgroup::'
+
+          sudo -n docker image prune -f || true
+          echo 'Deployment completed.'
+          REMOTE

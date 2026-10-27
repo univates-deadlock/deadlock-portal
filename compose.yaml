@@ -1,0 +1,22 @@
+services:
+  web:
+    container_name: deadlock-portal
+    build: .
+    ports:
+      - "127.0.0.1:8081:8080"
+    networks:
+      - default
+      - deadlock_edge
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  deadlock_edge:
+    name: deadlock_edge

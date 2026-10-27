@@ -1,0 +1,26 @@
+:8080 {
+  root * /usr/share/caddy
+  encode zstd gzip
+
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    Referrer-Policy strict-origin-when-cross-origin
+    Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  }
+
+  respond /health "ok" 200
+
+  @html path / /index.html
+  header @html Cache-Control "no-cache"
+
+  file_server
+
+  handle_errors {
+    @notfound expression `{err.status_code} == 404`
+    handle @notfound {
+      rewrite * /404.html
+      file_server
+    }
+  }
+}
