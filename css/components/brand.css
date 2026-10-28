@@ -1,0 +1,40 @@
+/* ==========================================================================
+   Brand Component
+   ========================================================================== */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.brand__logo {
+  border-radius: var(--radius-md);
+  transition: rotate 0.3s var(--ease-out);
+}
+
+.brand__name {
+  font-size: 24px;
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -1.4px;
+}
+
+.brand--compact .brand__name {
+  font-size: 20px;
+}
+
+.brand__dot {
+  color: var(--color-accent);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .brand:is(:hover, :focus-visible) .brand__logo {
+    rotate: -7deg;
+  }
+}
+
+@media (max-width: 760px) {
+  .brand:not(.brand--compact) .brand__name {
+    font-size: 22px;
+  }
+}

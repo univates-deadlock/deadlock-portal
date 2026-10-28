@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Site Footer Component
+   ========================================================================== */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer__inner {
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.site-footer__description,
+.site-footer__link,
+.site-footer__copyright {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.site-footer__link {
+  transition: color 0.2s;
+}
+
+.site-footer__link:is(:hover, :focus-visible) {
+  color: var(--color-text-strong);
+}
+
+@media (max-width: 760px) {
+  .site-footer__inner {
+    padding-block: 35px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .site-footer__description {
+    order: 4;
+    flex-basis: 100%;
+  }
+}

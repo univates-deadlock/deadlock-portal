@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Section Layout & Heading Components
+   ========================================================================== */
+.section {
+  padding-block: var(--section-padding-y);
+}
+
+.section-kicker {
+  margin-bottom: 21px;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-text-secondary);
+}
+
+.section-kicker__index {
+  margin-right: 14px;
+  color: var(--color-accent);
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 47px;
+}
+
+.section-heading__title {
+  font-size: clamp(36px, 4.2vw, 62px);
+  font-weight: 760;
+  line-height: var(--line-height-tight);
+  letter-spacing: -3.6px;
+}
+
+.section-heading__accent {
+  color: var(--color-text-muted);
+}
+
+.section-heading__description {
+  max-width: 325px;
+  font-size: var(--font-size-md);
+  line-height: 1.8;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 1060px) {
+  .section-heading__title {
+    letter-spacing: -2.6px;
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding-block: var(--section-padding-y-mobile);
+  }
+
+  .section-heading {
+    flex-direction: column;
+    align-items: start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .section-heading__title {
+    font-size: clamp(37px, 7vw, 51px);
+  }
+}
