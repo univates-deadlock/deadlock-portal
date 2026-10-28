@@ -1,39 +1,69 @@
 'use strict';
 
-const menuButton = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('.main-nav');
+(() => {
+  function initMobileNavigation() {
+    const header = document.querySelector('.site-header');
+    if (!header) return;
 
-function closeMenu() {
-  menuButton?.setAttribute('aria-expanded', 'false');
-  menuButton?.setAttribute('aria-label', 'Abrir menu');
-  navigation?.classList.remove('is-open');
-}
+    const menuButton = header.querySelector('.site-header__toggle');
+    const navigation = header.querySelector('.site-header__nav');
+    if (!menuButton || !navigation) return;
 
-menuButton?.addEventListener('click', () => {
-  const expanded = menuButton.getAttribute('aria-expanded') === 'true';
-  menuButton.setAttribute('aria-expanded', String(!expanded));
-  menuButton.setAttribute('aria-label', expanded ? 'Abrir menu' : 'Fechar menu');
-  navigation?.classList.toggle('is-open', !expanded);
-});
-
-navigation?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeMenu();
-});
-
-const year = String(new Date().getFullYear());
-document.querySelectorAll('[data-year]').forEach(element => { element.textContent = year; });
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (!reduceMotion && 'IntersectionObserver' in window) {
-  document.documentElement.classList.add('js-motion');
-  const observer = new IntersectionObserver((entries, instance) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        instance.unobserve(entry.target);
-      }
+    function setMenuOpen(isOpen) {
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+      menuButton.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+      navigation.classList.toggle('is-open', isOpen);
     }
-  }, { threshold: 0.1, rootMargin: '0px 0px 36px 0px' });
-  document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
-}
+
+    menuButton.addEventListener('click', () => {
+      const expanded = menuButton.getAttribute('aria-expanded') === 'true';
+      setMenuOpen(!expanded);
+    });
+
+    navigation.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => setMenuOpen(false));
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && navigation.classList.contains('is-open')) {
+        setMenuOpen(false);
+        menuButton.focus();
+      }
+    });
+
+    window.matchMedia('(min-width: 761px)').addEventListener('change', event => {
+      if (event.matches) setMenuOpen(false);
+    });
+  }
+
+  function initCurrentYear() {
+    const year = String(new Date().getFullYear());
+    document.querySelectorAll('[data-year]').forEach(element => {
+      element.textContent = year;
+    });
+  }
+
+  function initScrollReveal() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+
+    document.documentElement.classList.add('is-motion-ready');
+    const observer = new IntersectionObserver(
+      (entries, instance) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            instance.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px 36px 0px' }
+    );
+
+    document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
+  }
+
+  initMobileNavigation();
+  initCurrentYear();
+  initScrollReveal();
+})();
