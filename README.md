@@ -35,13 +35,15 @@ movimentos respeitam a preferência de movimento reduzido do dispositivo.
 ├── js/main.js                 # Menu mobile, ano e reveal discreto
 ├── js/gallery.js              # Galeria acessível das capturas reais
 ├── css/interactions.css       # Hovers, foco, feedback e estilo da galeria
-├── assets/                    # Logo, favicon, capa, fotos da equipe e capturas
-├── docs/asset-sources.md       # Origem das imagens e atualização das capturas
+├── assets/                    # Logo, favicon, capa, fotos da equipe, capturas e fontes
+├── docs/asset-sources.md       # Origem das imagens, fontes e atualização das capturas
+├── docs/github-topics.json     # Metadados de tópicos do repositório
 ├── tests/check_site.py        # Validação de referências locais
 ├── tests/check_interactions.cjs # Verificação opcional no navegador
 ├── .github/workflows/
 │   ├── ci.yml                 # Validação e smoke test do container
-│   └── deploy.yml             # Deploy SSH na VM a partir da main
+│   ├── deploy.yml             # Deploy SSH na VM a partir da main
+│   └── notify-deploy.yml      # Notificação para deploy central (deadlock-deploy)
 ├── Dockerfile                 # Caddy Alpine
 ├── Caddyfile                  # HTTP interno na porta 8080
 └── compose.yaml               # Container, rede e porta local 8081
@@ -57,7 +59,7 @@ cd deadlock-portal
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Abra **http://127.0.0.1:8000/**. Para encerrar, use `Ctrl+C`. Durante o desenvolvimento inicial em `matbforge`, use `https://github.com/matbforge/deadlock-portal.git` como endereço do clone.
+Abra **http://127.0.0.1:8000/**. Para encerrar, use `Ctrl+C`.
 
 Com Docker, use:
 
@@ -93,19 +95,22 @@ O teste cobre a galeria, navegação por teclado, foco, bloqueio de rolagem,
 fechamento por botão/Esc/clique fora, preferência de movimento reduzido,
 telas de 320/390/1440 pixels e abertura das capturas sem JavaScript.
 
-## CI/CD — GitHub Actions → VM da Univates
+## CI/CD — GitHub Actions
 
 Fluxo:
 
 ```text
 push/PR ──> CI (HTML/links/JS/Compose/Caddy via smoke test)
-CI aprovado na main ──> CD (SSH com known_hosts) ──> git pull na VM
-           └──> docker compose up -d --build --wait ──> GET /health
+CI aprovado na main ──┬──> Central CD (notify-deploy.yml via repository dispatch)
+                      └──> Deploy direto SSH (deploy.yml com known_hosts) ──> VM
 ```
 
-O CD só inicia automaticamente após o **CI da `main` concluir com sucesso** (além de aceitar `workflow_dispatch`). Foi adaptado do workflow de `univates-deadlock/techpro-institutional-page`. Para não bloquear a criação inicial do repositório, **o deploy é ignorado quando faltam secrets**. Depois de configurá-los, faça outro push em `main` ou execute **Actions → CD — Deploy Deadlock Portal → Run workflow**.
+O repositório possui duas formas de automação de entrega após o **CI da `main` concluir com sucesso**:
 
-### 1. Preparar o clone na VM (somente uma vez)
+1. **Notificação de CD Central (`notify-deploy.yml`):** Notifica o repositório central [`univates-deadlock/deadlock-deploy`](https://github.com/univates-deadlock/deadlock-deploy) através de repository dispatch (`deploy-main`), utilizando o secret `DEPLOY_DISPATCH_TOKEN`.
+2. **Deploy direto SSH (`deploy.yml`):** Conecta diretamente na VM via SSH e executa `git pull` e `docker compose up -d --build --wait` (também aceita acionamento manual por `workflow_dispatch`). Para não bloquear execuções quando os secrets SSH não estiverem definidos, o deploy direto é ignorado de forma segura.
+
+### 1. Preparar o clone na VM (somente uma vez para deploy direto)
 
 Conecte-se à VM por SSH de uma rede permitida e execute **como o mesmo usuário usado por `VM_USER`**:
 
@@ -117,23 +122,20 @@ sudo docker compose up -d --build --wait
 curl -fsS http://127.0.0.1:8081/health
 ```
 
-Se o projeto ainda estiver privado em `matbforge`, faça o clone usando a URL dessa organização e uma credencial Git autorizada na VM. Após a transferência, ajuste o remoto: `git remote set-url origin https://github.com/univates-deadlock/deadlock-portal.git`. Para repositórios privados, o VM precisa de autenticação para `git pull` independentemente da chave usada pelo Actions para acessar a VM.
-
 A conta SSH precisa ter `sudo -n docker ...` autorizado sem prompt de senha, como no workflow institucional original. Nenhuma regra de UFW extra é necessária para a porta 8081, pois o serviço está disponível somente em `127.0.0.1` no host.
 
 ### 2. Configurar secrets organizacionais
 
-Configure os seguintes **Actions secrets** na organização que possui o repositório. Se escolher visibilidade **Selected repositories**, inclua explicitamente o `deadlock-portal`.
+Configure os seguintes **Actions secrets** na organização `univates-deadlock` (ou explicitamente para o repositório `deadlock-portal`):
 
-| Secret | Valor esperado |
-| --- | --- |
-| `VM_HOST` | IP ou DNS que o runner do GitHub consegue acessar por SSH |
-| `VM_USER` | Conta Linux do usuário que possui `~/deadlock-portal` |
-| `VM_PORT` | Porta externa SSH configurada na VM (padrão 22 se omitido) |
-| `VM_SSH_KEY` | Chave **privada** SSH autorizada para `VM_USER` |
-| `VM_KNOWN_HOSTS` | Entrada validada do host/porta, incluindo `[host]:porta` quando não for 22 |
-
-Os secrets **não são transferidos automaticamente** entre `matbforge` e `univates-deadlock`. Reative o acesso aos secrets na nova organização após mover o repositório. Não copie chaves privadas para o Git.
+| Secret | Workflow | Finalidade / Valor esperado |
+| --- | --- | --- |
+| `DEPLOY_DISPATCH_TOKEN` | `notify-deploy.yml` | Token com permissão para disparar o repositório central `deadlock-deploy` |
+| `VM_HOST` | `deploy.yml` | IP ou DNS que o runner do GitHub consegue acessar por SSH |
+| `VM_USER` | `deploy.yml` | Conta Linux do usuário que possui `~/deadlock-portal` |
+| `VM_PORT` | `deploy.yml` | Porta externa SSH configurada na VM (padrão 22 se omitido) |
+| `VM_SSH_KEY` | `deploy.yml` | Chave **privada** SSH autorizada para `VM_USER` |
+| `VM_KNOWN_HOSTS` | `deploy.yml` | Entrada validada do host/porta, incluindo `[host]:porta` quando não for 22 |
 
 ### 3. Tornar a página pública com HTTPS sem disputar 80/443
 
@@ -187,22 +189,11 @@ Se o deploy falhar, consulte **Actions → CD — Deploy Deadlock Portal**, conf
 
 As atribuições refletem o escopo do projeto acadêmico, não cargos profissionais.
 
-## Publicar o repositório no GitHub
-
-No computador com `gh` autenticado e Git configurado, descompacte o projeto e execute:
-
-```bash
-cd deadlock-portal
-bash scripts/publish.sh
-```
-
-O script cria **`matbforge/deadlock-portal`** público, com descrição, topics, branch `main` e todos os arquivos. Ele não substitui repositórios existentes e depende da permissão de criar repositórios na organização. Para usar outro owner/nome, passe `bash scripts/publish.sh owner/repo`.
-
-## Metadados sugeridos para o GitHub
+## Metadados do GitHub
 
 **Descrição:** Portal da equipe Deadlock — projetos, integrantes e desenvolvimento de software na Univates.
 
-**Topics:** `deadlock`, `portfolio`, `landing-page`, `html`, `css`, `javascript`, `caddy`, `docker`, `github-actions`, `devops`, `univates`, `techpro`
+**Topics:** `deadlock`, `portfolio`, `landing-page`, `html`, `css`, `javascript`, `caddy`, `docker`, `github-actions`, `devops`, `univates`, `techpro` (definidos também em [`docs/github-topics.json`](docs/github-topics.json))
 
 **Homepage:** preencher depois de configurar o DNS e o HTTPS.
 

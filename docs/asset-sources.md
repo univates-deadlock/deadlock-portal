@@ -1,8 +1,8 @@
 # Fontes dos assets
 
-Imagens consultadas e capturadas em 27/10/2026. Os arquivos ficam no portal para
-que a página não dependa de requisições ao GitHub ou a um serviço de screenshots.
-Não são imagens geradas nem interfaces conceituais.
+Imagens e fontes consultadas e empacotadas no portal. Os arquivos ficam no repositório
+para que a página não dependa de requisições a serviços externos durante a navegação.
+Não são imagens geradas por IA nem interfaces conceituais.
 
 ## Identidade Deadlock
 
@@ -15,6 +15,10 @@ Não são imagens geradas nem interfaces conceituais.
   do portal.
 
 A logo provisória de cadeado e suas versões antigas foram removidas.
+
+## Tipografia
+
+- `assets/fonts/InterVariable.woff2`: Família tipográfica Inter (versão variável), criada por Rasmus Andersson. Distribuída sob a licença [SIL Open Font License 1.1](https://openfontlicense.org/). O arquivo foi empacotado localmente no portal para assegurar autonomia completa, performance e privacidade sem carregar fontes de CDNs externas durante a navegação.
 
 ## Participantes
 
