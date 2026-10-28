@@ -48,7 +48,7 @@ movimentos respeitam a preferência de movimento reduzido do dispositivo.
 ├── tests/check_interactions.cjs # Verificação opcional no navegador
 ├── .github/workflows/
 │   ├── ci.yml                  # Validação e smoke test do container
-│   ├── deploy.yml              # Deploy SSH na VM a partir da main
+│   ├── deploy.yml              # Workflow legado de deploy direto SSH (desativado)
 │   └── notify-deploy.yml       # Notificação para deploy central (deadlock-deploy)
 ├── Dockerfile                  # Caddy Alpine
 ├── Caddyfile                   # HTTP interno na porta 8080
@@ -107,84 +107,66 @@ Fluxo:
 
 ```text
 push/PR ──> CI (HTML/links/JS/Compose/Caddy via smoke test)
-CI aprovado na main ──┬──> Central CD (notify-deploy.yml via repository dispatch)
-                      └──> Deploy direto SSH (deploy.yml com known_hosts) ──> VM
+CI aprovado na main ──> CD Centralizado (notify-deploy.yml via repository_dispatch) ──> deadlock-deploy (VM)
 ```
 
-O repositório possui duas formas de automação de entrega após o **CI da `main` concluir com sucesso**:
+O repositório utiliza entrega contínua centralizada via **CD Central (`notify-deploy.yml`)**, acionada automaticamente após o **CI da `main` concluir com sucesso**:
 
-1. **Notificação de CD Central (`notify-deploy.yml`):** Notifica o repositório central [`univates-deadlock/deadlock-deploy`](https://github.com/univates-deadlock/deadlock-deploy) através de repository dispatch (`deploy-main`), utilizando o secret `DEPLOY_DISPATCH_TOKEN`.
-2. **Deploy direto SSH (`deploy.yml`):** Conecta diretamente na VM via SSH e executa `git pull` e `docker compose up -d --build --wait` (também aceita acionamento manual por `workflow_dispatch`). Para não bloquear execuções quando os secrets SSH não estiverem definidos, o deploy direto é ignorado de forma segura.
+1. **Notificação de CD Central (`notify-deploy.yml` — mecanismo ativo):**
+   Após a validação do CI em push na branch `main`, este workflow envia um evento `repository_dispatch` do tipo `deploy-main` para o repositório de orquestração [`univates-deadlock/deadlock-deploy`](https://github.com/univates-deadlock/deadlock-deploy), utilizando o token `DEPLOY_DISPATCH_TOKEN`. O payload inclui o nome do repositório (`univates-deadlock/deadlock-portal`) e o commit SHA exato que acabou de ser testado.
+   Na VM da Univates, um runner self-hosted dedicado consome o evento, executa `git fetch` validando o commit exato, atualiza o container com `docker compose up -d --build --wait` e valida os health checks locais antes de concluir. A entrega é realizada sem expor portas SSH para o GitHub nem depender de conexões de entrada.
 
-### 1. Preparar o clone na VM (somente uma vez para deploy direto)
+2. **Deploy direto SSH (`deploy.yml` — fluxo legado, desativado):**
+   Mecanismo anterior baseado em SSH direto acionado a partir do GitHub Actions. O workflow permanece no repositório exclusivamente por histórico e fallback manual (`workflow_dispatch`), mas está desativado na rotina padrão e é ignorado de forma segura caso os segredos SSH não estejam configurados.
 
-Conecte-se à VM por SSH de uma rede permitida e execute **como o mesmo usuário usado por `VM_USER`**:
+### 1. Configurar secrets organizacionais
 
-```bash
-cd "$HOME"
-git clone https://github.com/univates-deadlock/deadlock-portal.git deadlock-portal
-cd deadlock-portal
-sudo docker compose up -d --build --wait
-curl -fsS http://127.0.0.1:8081/health
-```
+Configure o secret organizacional necessário para a entrega contínua do repositório:
 
-A conta SSH precisa ter `sudo -n docker ...` autorizado sem prompt de senha, como no workflow institucional original. Nenhuma regra de UFW extra é necessária para a porta 8081, pois o serviço está disponível somente em `127.0.0.1` no host.
+| Secret | Workflow | Status | Finalidade / Valor esperado |
+| --- | --- | --- | --- |
+| `DEPLOY_DISPATCH_TOKEN` | `notify-deploy.yml` | **Ativo** | Token com permissão de escrita (*Contents: Read and write*) para disparar o repositório central `deadlock-deploy` |
+| `VM_HOST` | `deploy.yml` | *Legado (desativado)* | Requisito exclusivo do workflow legado; IP ou DNS acessível por SSH |
+| `VM_USER` | `deploy.yml` | *Legado (desativado)* | Requisito exclusivo do workflow legado; conta Linux no host |
+| `VM_PORT` | `deploy.yml` | *Legado (desativado)* | Requisito exclusivo do workflow legado; porta SSH externa (padrão 22 se omitido) |
+| `VM_SSH_KEY` | `deploy.yml` | *Legado (desativado)* | Requisito exclusivo do workflow legado; chave privada SSH autorizada para `VM_USER` |
+| `VM_KNOWN_HOSTS` | `deploy.yml` | *Legado (desativado)* | Requisito exclusivo do workflow legado; entrada validada do host/porta no `known_hosts` |
 
-### 2. Configurar secrets organizacionais
+> Os segredos `VM_*` pertencem exclusivamente ao workflow legado `deploy.yml` (atualmente desativado). Não são necessários para o fluxo padrão de publicação via `deadlock-deploy`.
 
-Configure os seguintes **Actions secrets** na organização `univates-deadlock` (ou explicitamente para o repositório `deadlock-portal`):
+### 2. Infraestrutura central e exposição pública HTTPS (`deadlock-deploy`)
 
-| Secret | Workflow | Finalidade / Valor esperado |
-| --- | --- | --- |
-| `DEPLOY_DISPATCH_TOKEN` | `notify-deploy.yml` | Token com permissão para disparar o repositório central `deadlock-deploy` |
-| `VM_HOST` | `deploy.yml` | IP ou DNS que o runner do GitHub consegue acessar por SSH |
-| `VM_USER` | `deploy.yml` | Conta Linux do usuário que possui `~/deadlock-portal` |
-| `VM_PORT` | `deploy.yml` | Porta externa SSH configurada na VM (padrão 22 se omitido) |
-| `VM_SSH_KEY` | `deploy.yml` | Chave **privada** SSH autorizada para `VM_USER` |
-| `VM_KNOWN_HOSTS` | `deploy.yml` | Entrada validada do host/porta, incluindo `[host]:porta` quando não for 22 |
+A publicação externa e a terminação TLS do portal são providas pela infraestrutura central [`deadlock-deploy`](https://github.com/univates-deadlock/deadlock-deploy), já implantada na VM.
 
-### 3. Tornar a página pública com HTTPS sem disputar 80/443
-
-A VM já publica `techpro.matbdev.com` por outro Caddy, que ocupa as portas 80/443. Este portal usa **seu próprio Caddy de aplicação**, mas precisa entrar no **Caddy de borda existente** para receber um domínio HTTPS. O Compose cria uma rede Docker nomeada `deadlock_edge`.
-
-No `compose.yaml` do **projeto institucional**, adicione a rede externa ao serviço `web`, preservando suas redes atuais:
-
-```yaml
-services:
-  web:
-    networks:
-      - default
-      - deadlock_edge
-
-networks:
-  deadlock_edge:
-    external: true
-```
-
-> Trecho para mesclar, não para substituir o Compose inteiro do site institucional.
-
-No `Caddyfile` do site institucional (Caddy de borda), adicione outro bloco além de `techpro.matbdev.com`:
+- **Caddy de borda unificado (`deadlock-edge`):** Um container Caddy compartilhado ocupa as portas públicas `80` (HTTP) e `443` (HTTPS e HTTP/3), emitindo e renovando certificados TLS automaticamente via ACME.
+- **Rede Docker compartilhada (`deadlock_edge`):** O `compose.yaml` deste portal declara a rede externa `deadlock_edge`. Com isso, o container `deadlock-portal` comunica-se diretamente com o proxy de borda sem expor portas 80/443 adicionais no host.
+- **Roteamento oficial:** No `infra/edge/Caddyfile` do `deadlock-deploy`, o domínio oficial do portal já se encontra configurado e apontado para o serviço interno:
 
 ```caddyfile
-# Substituir por domínio real, depois de configurar o DNS apontando para a VM.
-portal.example.com {
+deadlock.matbdev.com {
     reverse_proxy deadlock-portal:8080
 }
 ```
 
-Por fim, aplique as alterações do site institucional com `docker compose up -d --build` naquele projeto. **Não adicione novas publicações de porta 80/443 ao portal.** O HTTPS e os certificados ficam a cargo do Caddy de borda. A migração do domínio exige DNS, validação da acessibilidade 80/443 e escolha de nome pela equipe — não ocorre apenas pela configuração deste repositório.
+Dessa forma, **não adicione publicações de porta 80/443 ao portal** nem altere arquivos de outros projetos (como o site institucional). O Caddy interno do container escuta na porta `8080` (mapeada para `127.0.0.1:8081` no loopback da VM para testes locais e health checks) e o Caddy de borda central responde externamente por [`deadlock.matbdev.com`](https://deadlock.matbdev.com).
 
-### 4. Operação e diagnóstico
+### 3. Operação e diagnóstico
 
 ```bash
-cd ~/deadlock-portal
-sudo docker compose ps
-sudo docker compose logs --tail=100 web
+# Diagnóstico local do container do portal na VM
+sudo docker compose -f ~/deadlock-portal/compose.yaml ps
+sudo docker compose -f ~/deadlock-portal/compose.yaml logs --tail=100 web
 curl -i http://127.0.0.1:8081/health
-sudo docker compose up -d --build --wait
+
+# Diagnóstico do ingress central e status da infraestrutura
+sudo docker ps --filter name=deadlock-edge
+sudo docker logs --tail=50 deadlock-edge
+cat ~/.local/state/deadlock-deploy/portal.sha
 ```
 
-Se o deploy falhar, consulte **Actions → CD — Deploy Deadlock Portal**, confirme que o repositório está clonado em `~/deadlock-portal`, que `git pull` funciona no usuário SSH e que os secrets organizacionais estão habilitados para o repositório.
+Para investigar execuções de entrega:
+1. Em **Actions → Notify central CD** neste repositório, confirme que a notificação por dispatch retornou código HTTP 204.
+2. Em **Actions → Deploy Deadlock** no repositório [`deadlock-deploy`](https://github.com/univates-deadlock/deadlock-deploy), acompanhe a compilação, o reload do container e a validação do health check executados pelo runner na VM.
 
 ## Equipe
 
@@ -201,7 +183,7 @@ As atribuições refletem o escopo do projeto acadêmico, não cargos profission
 
 **Topics:** `deadlock`, `portfolio`, `landing-page`, `html`, `css`, `javascript`, `caddy`, `docker`, `github-actions`, `devops`, `univates`, `techpro` (definidos também em [`docs/github-topics.json`](docs/github-topics.json))
 
-**Homepage:** preencher depois de configurar o DNS e o HTTPS.
+**Homepage:** https://deadlock.matbdev.com
 
 ## Licença e identidade
 
