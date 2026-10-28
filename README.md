@@ -31,22 +31,28 @@ movimentos respeitam a preferência de movimento reduzido do dispositivo.
 .
 ├── index.html                  # Página única do portal
 ├── 404.html                    # Página de erro para Caddy
-├── css/style.css              # Layout, tokens e responsividade
-├── js/main.js                 # Menu mobile, ano e reveal discreto
-├── js/gallery.js              # Galeria acessível das capturas reais
-├── css/interactions.css       # Hovers, foco, feedback e estilo da galeria
-├── assets/                    # Logo, favicon, capa, fotos da equipe, capturas e fontes
+├── AGENTS.md                   # Convenções de arquitetura, BEM e fluxo de desenvolvimento
+├── CLAUDE.md                   # Instruções para agentes e referência às skills instaladas
+├── css/
+│   ├── variables.css           # Design tokens (cores, tipografia, espaçamentos e movimento)
+│   ├── global.css              # Fonte local, reset, layout base e utilitários globais
+│   ├── components/             # Estilos BEM de componentes reutilizáveis e galeria
+│   └── pages/                  # Estilos específicos das páginas (home.css e 404.css)
+├── js/
+│   ├── main.js                 # Menu mobile, ano dinâmico e reveal progressivo
+│   └── gallery.js              # Galeria acessível das capturas reais
+├── assets/                     # Logo, favicon, capa, fotos da equipe, capturas e fontes
 ├── docs/asset-sources.md       # Origem das imagens, fontes e atualização das capturas
 ├── docs/github-topics.json     # Metadados de tópicos do repositório
-├── tests/check_site.py        # Validação de referências locais
+├── tests/check_site.py         # Validação de referências locais e assets CSS
 ├── tests/check_interactions.cjs # Verificação opcional no navegador
 ├── .github/workflows/
-│   ├── ci.yml                 # Validação e smoke test do container
-│   ├── deploy.yml             # Deploy SSH na VM a partir da main
-│   └── notify-deploy.yml      # Notificação para deploy central (deadlock-deploy)
-├── Dockerfile                 # Caddy Alpine
-├── Caddyfile                  # HTTP interno na porta 8080
-└── compose.yaml               # Container, rede e porta local 8081
+│   ├── ci.yml                  # Validação e smoke test do container
+│   ├── deploy.yml              # Deploy SSH na VM a partir da main
+│   └── notify-deploy.yml       # Notificação para deploy central (deadlock-deploy)
+├── Dockerfile                  # Caddy Alpine
+├── Caddyfile                   # HTTP interno na porta 8080
+└── compose.yaml                # Container, rede e porta local 8081
 ```
 
 ## Rodar localmente
