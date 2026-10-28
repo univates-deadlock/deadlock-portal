@@ -1,0 +1,128 @@
+:root {
+  color-scheme: dark;
+  scrollbar-gutter: stable;
+
+  /* ==========================================================================
+     Color Palette & Semantic Surfaces
+     ========================================================================== */
+  --color-bg: #0b0b0e;
+  --color-bg-elevated: #111114;
+  --color-bg-terminal: #101015;
+  --color-surface: #141418;
+  --color-surface-raised: #19171e;
+  --color-surface-control: #201e26;
+  --color-surface-hover: #1a1723;
+  --color-surface-drawer: #17161b;
+  --color-surface-preview: #0e1930;
+  --color-surface-dark-cta: #201b2a;
+
+  /* ==========================================================================
+     Text Colors
+     ========================================================================== */
+  --color-text: #f4f3f6;
+  --color-text-strong: #ffffff;
+  --color-text-secondary: #c4c2ca;
+  --color-text-body: #b6b3c0;
+  --color-text-muted: #a6a5b3;
+  --color-text-subtle: #817e8c;
+  --color-text-inverse: #171122;
+  --color-text-closing-muted: #5b4985;
+  --color-text-closing-meta: #3b2c64;
+
+  /* ==========================================================================
+     Borders & Accents
+     ========================================================================== */
+  --color-border: #2b2a31;
+  --color-border-subtle: #24232a;
+  --color-border-strong: #383440;
+  --color-border-control: #56515f;
+  --color-border-hover: #9a8ec2;
+  --color-border-header: rgba(255, 255, 255, 0.085);
+
+  --color-accent: #aaa0ff;
+  --color-accent-soft: #b7acff;
+  --color-accent-strong: #6650df;
+  --color-accent-hover: #d4ceff;
+  --color-highlight: #cdff8e;
+
+  --color-terminal-success: #9ecb9d;
+  --color-terminal-prompt: #bbf19b;
+  --color-dot-red: #f39a95;
+  --color-dot-amber: #ecca7f;
+  --color-dot-green: #85c99f;
+  --color-backdrop: rgb(4 4 8 / 88%);
+
+  /* ==========================================================================
+     Typography
+     ========================================================================== */
+  --font-family-sans: "Inter", "Segoe UI", Arial, sans-serif;
+  --font-family-serif: Georgia, serif;
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+
+  --font-size-2xs: 0.625rem; /* 10px */
+  --font-size-xs: 0.6875rem; /* 11px */
+  --font-size-sm: 0.75rem; /* 12px */
+  --font-size-base: 0.8125rem; /* 13px */
+  --font-size-md: 0.875rem; /* 14px */
+  --font-size-lg: 1rem; /* 16px */
+  --font-size-xl: 1.375rem; /* 22px */
+  --font-size-2xl: 1.5625rem; /* 25px */
+  --font-size-3xl: 1.9375rem; /* 31px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 650;
+  --font-weight-bold: 750;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  --line-height-none: 1;
+  --line-height-tight: 1.08;
+  --line-height-snug: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  --letter-spacing-mono: 1.7px;
+
+  /* ==========================================================================
+     Layout & Spacing
+     ========================================================================== */
+  --container-max-width: 1232px;
+  --container-padding: 32px;
+  --container-padding-mobile: 20px;
+  --header-height: 88px;
+  --header-height-mobile: 74px;
+  --section-padding-y: 100px;
+  --section-padding-y-mobile: 75px;
+
+  --spacing-2xs: 0.25rem;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* ==========================================================================
+     Border Radius, Shadows, Motion & Z-Index
+     ========================================================================== */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-terminal: 0 18px 80px rgba(0, 0, 0, 0.24);
+  --shadow-pulse: 0 0 15px rgba(205, 255, 142, 0.4);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.25s var(--ease-out);
+  --transition-slow: 0.5s var(--ease-out);
+
+  --z-base: 1;
+  --z-elevated: 2;
+  --z-header: 20;
+  --z-skip-link: 99;
+}
