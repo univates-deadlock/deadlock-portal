@@ -8,12 +8,15 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Deadlock — Build what comes next">
   <meta property="og:description" content="Pessoas, ideias e código. Conheça os projetos desenvolvidos pela equipe Deadlock.">
-  <meta property="og:image" content="assets/og-cover.svg">
+  <meta property="og:image" content="assets/og-cover.png">
+  <meta property="og:image:alt" content="Deadlock — Ideias em código. Impacto no mundo.">
   <title>Deadlock — Build what comes next</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/deadlock-mark.svg" as="image" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.png" type="image/png" sizes="48x48">
+  <link rel="preload" href="assets/deadlock-logo.png" as="image" type="image/png">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interactions.css">
   <script src="js/main.js" defer></script>
+  <script src="js/gallery.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -22,7 +25,7 @@
   <header class="site-header" id="topo">
     <div class="container header-inner">
       <a class="brand" href="#topo" aria-label="Deadlock, voltar ao início">
-        <img src="assets/deadlock-mark.svg" alt="" width="39" height="39">
+        <img src="assets/deadlock-logo.png" alt="" width="39" height="39">
         <span>deadlock<span class="brand-dot">.</span></span>
       </a>
 
@@ -58,7 +61,7 @@
         <div class="art-halo halo-2"></div>
         <div class="art-halo halo-3"></div>
         <span class="art-node node-one"></span><span class="art-node node-two"></span>
-        <div class="art-core"><img src="assets/deadlock-mark.svg" alt="" width="140" height="140"></div>
+        <div class="art-core"><img src="assets/deadlock-logo.png" alt="" width="460" height="460"></div>
         <span class="art-coordinate coordinate-top">D / L — 026</span>
         <span class="art-coordinate coordinate-bottom">SYSTEM // READY</span>
         <div class="art-accent"></div>
@@ -79,22 +82,19 @@
       <div class="project-grid">
         <article class="project-card project-app reveal">
           <div class="project-top"><span>PROJETO 001</span><span class="project-category">SISTEMA WEB</span></div>
-          <div class="project-art project-art-app" aria-hidden="true">
-            <div class="interface-preview">
-              <div class="preview-sidebar"><div class="preview-icon"></div><i></i><i></i><i></i><i></i></div>
-              <div class="preview-main"><div class="preview-toolbar"><span>TechPro / Dashboard</span><span class="preview-dots">● ● ●</span></div><div class="preview-kpi"><div><small>CLIENTES</small><b>247</b><span class="fake-bar"></span></div><div><small>ORÇAMENTOS</small><b>84</b><span class="fake-bar"></span></div><div><small>SERVIÇOS</small><b>31</b><span class="fake-bar"></span></div></div><div class="preview-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
-            </div>
-            <span class="preview-caption">ILUSTRAÇÃO CONCEITUAL</span>
-          </div>
+          <a class="project-art" href="assets/projects/techpro-app.webp" target="_blank" rel="noopener noreferrer" aria-label="Ampliar captura da tela de login do TechPro App">
+            <img src="assets/projects/techpro-app.webp" alt="Tela real de login do TechPro App, com identidade visual da TechPro e formulário de acesso por e-mail e senha." width="1440" height="900" loading="lazy" decoding="async">
+            <span class="preview-prompt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>Ampliar prévia</span>
+          </a>
           <div class="project-info"><div class="project-title-row"><div><h3>TechPro <span>App</span></h3><p>Uma plataforma para conectar clientes, orçamentos e a gestão de serviços em um único lugar.</p></div><span class="project-number">01</span></div><div class="project-footer"><div class="tags"><span>Next.js</span><span>Node.js</span><span>PostgreSQL</span></div><a class="project-link" href="https://github.com/univates-deadlock/techpro-app" target="_blank" rel="noopener noreferrer" aria-label="Ver repositório TechPro App no GitHub">Código-fonte <span aria-hidden="true">↗</span></a></div></div>
         </article>
 
         <article class="project-card project-web reveal">
           <div class="project-top"><span>PROJETO 002</span><span class="project-category">WEBSITE</span></div>
-          <div class="project-art project-art-web" aria-hidden="true">
-            <div class="browser-preview"><div class="browser-bar"><span>● ● ●</span><span>techpro.matbdev.com</span><span>↗</span></div><div class="browser-body"><div class="browser-logo"><span class="browser-lock">◆</span> TECH<span>PRO</span></div><span class="browser-mini">SEGURANÇA & AUTOMAÇÃO</span><div class="browser-title">Tecnologia que<br><em>protege.</em></div><div class="browser-button">CONHEÇA NOSSAS SOLUÇÕES →</div><span class="browser-orbit"></span></div></div>
-            <span class="preview-caption">ILUSTRAÇÃO CONCEITUAL</span>
-          </div>
+          <a class="project-art" href="assets/projects/techpro-website.webp" target="_blank" rel="noopener noreferrer" aria-label="Ampliar captura do site institucional TechPro">
+            <img src="assets/projects/techpro-website.webp" alt="Página inicial real do site TechPro, com serviços de segurança eletrônica e botão para solicitar orçamento." width="1440" height="900" loading="lazy" decoding="async">
+            <span class="preview-prompt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>Ampliar prévia</span>
+          </a>
           <div class="project-info"><div class="project-title-row"><div><h3>TechPro <span>Website</span></h3><p>Uma experiência digital para apresentar os serviços, a identidade e os canais de contato da TechPro.</p></div><span class="project-number">02</span></div><div class="project-footer"><div class="tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div><div class="project-links"><a class="project-link secondary-link" href="https://techpro.matbdev.com" target="_blank" rel="noopener noreferrer" aria-label="Abrir site TechPro">Visitar <span aria-hidden="true">↗</span></a><a class="project-link" href="https://github.com/univates-deadlock/techpro-institutional-page" target="_blank" rel="noopener noreferrer" aria-label="Ver repositório TechPro Website no GitHub">Código-fonte <span aria-hidden="true">↗</span></a></div></div></div>
         </article>
       </div>
@@ -107,16 +107,34 @@
 
     <section class="team section container" id="equipe" aria-labelledby="team-title"><div class="section-heading reveal"><div><p class="section-kicker"><span class="section-index">03 /</span> AS PESSOAS</p><h2 id="team-title">Quem faz <span>acontecer.</span></h2></div><p>Quatro pessoas, diferentes especialidades e um objetivo em comum.</p></div>
       <div class="team-grid">
-        <a class="member-card reveal" href="https://github.com/matbdev" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Mateus Carniel Brambilla"><div class="member-avatar"><span>MB</span><span class="avatar-ornament">✳</span></div><span class="member-position">01 / INFRA & BACKEND</span><h3>Mateus<br>Brambilla</h3><span class="member-profile">@matbdev <span aria-hidden="true">↗</span></span></a>
-        <a class="member-card reveal" href="https://github.com/alexandrapadilha1" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Alexandra Padilha"><div class="member-avatar"><span>AP</span><span class="avatar-ornament">✳</span></div><span class="member-position">02 / FRONTEND & SITE</span><h3>Alexandra<br>Padilha</h3><span class="member-profile">@alexandrapadilha1 <span aria-hidden="true">↗</span></span></a>
-        <a class="member-card reveal" href="https://github.com/DiogoFZanco" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Diogo Felipe Zanco"><div class="member-avatar"><span>DZ</span><span class="avatar-ornament">✳</span></div><span class="member-position">03 / FRONTEND</span><h3>Diogo<br>Zanco</h3><span class="member-profile">@DiogoFZanco <span aria-hidden="true">↗</span></span></a>
-        <a class="member-card reveal" href="https://github.com/TainaSchmidt" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Tainá Luiza Schmidt"><div class="member-avatar"><span>TS</span><span class="avatar-ornament">✳</span></div><span class="member-position">04 / BACKEND</span><h3>Tainá<br>Schmidt</h3><span class="member-profile">@TainaSchmidt <span aria-hidden="true">↗</span></span></a>
+        <a class="member-card reveal" href="https://github.com/matbdev" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Mateus Carniel Brambilla"><div class="member-avatar"><img src="assets/team/matbdev.webp" alt="Foto de perfil de Mateus Carniel Brambilla no GitHub" width="320" height="320" loading="lazy" decoding="async"></div><span class="member-position">01 / DEVOPS & BACKEND</span><h3>Mateus Carniel<br>Brambilla</h3><span class="member-profile">@matbdev <span aria-hidden="true">↗</span></span></a>
+        <a class="member-card reveal" href="https://github.com/alexandrapadilha1" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Alexandra Padilha"><div class="member-avatar"><img src="assets/team/alexandrapadilha1.webp" alt="Foto de perfil de Alexandra Padilha no GitHub" width="320" height="320" loading="lazy" decoding="async"></div><span class="member-position">02 / FRONTEND & SITE</span><h3>Alexandra<br>Padilha</h3><span class="member-profile">@alexandrapadilha1 <span aria-hidden="true">↗</span></span></a>
+        <a class="member-card reveal" href="https://github.com/DiogoFZanco" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Diogo Felipe Zanco"><div class="member-avatar"><img src="assets/team/DiogoFZanco.webp" alt="Foto de perfil de Diogo Felipe Zanco no GitHub" width="320" height="320" loading="lazy" decoding="async"></div><span class="member-position">03 / FRONTEND</span><h3>Diogo Felipe<br>Zanco</h3><span class="member-profile">@DiogoFZanco <span aria-hidden="true">↗</span></span></a>
+        <a class="member-card reveal" href="https://github.com/TainaSchmidt" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Tainá Luiza Schmidt"><div class="member-avatar"><img src="assets/team/TainaSchmidt.webp" alt="Foto de perfil de Tainá Luiza Schmidt no GitHub" width="320" height="320" loading="lazy" decoding="async"></div><span class="member-position">04 / BACKEND</span><h3>Tainá Luiza<br>Schmidt</h3><span class="member-profile">@TainaSchmidt <span aria-hidden="true">↗</span></span></a>
       </div>
     </section>
 
     <section class="closing container section reveal" aria-labelledby="closing-title"><div class="closing-inner"><span class="closing-top">DEADLOCK © <span data-year>2026</span> <span class="closing-asterisk">✳</span> OPEN TO WHAT'S NEXT</span><h2 id="closing-title">Código é o meio.<br><em>Construir é o propósito.</em></h2><a class="button button-light" href="https://github.com/univates-deadlock" target="_blank" rel="noopener noreferrer">Ver nossos projetos <span aria-hidden="true">↗</span></a><span class="closing-watermark" aria-hidden="true">D/L</span></div></section>
   </main>
 
-  <footer class="site-footer"><div class="container footer-inner"><a class="brand brand-footer" href="#topo"><img src="assets/deadlock-mark.svg" alt="" width="31" height="31"><span>deadlock<span class="brand-dot">.</span></span></a><p>Projeto acadêmico · Engenharia de Software · Univates</p><a href="https://github.com/univates-deadlock" target="_blank" rel="noopener noreferrer">GitHub ↗</a><small>© <span data-year>2026</span> Deadlock</small></div></footer>
+  <footer class="site-footer"><div class="container footer-inner"><a class="brand brand-footer" href="#topo"><img src="assets/deadlock-logo.png" alt="" width="31" height="31"><span>deadlock<span class="brand-dot">.</span></span></a><p>Projeto acadêmico · Engenharia de Software · Univates</p><a href="https://github.com/univates-deadlock" target="_blank" rel="noopener noreferrer">GitHub ↗</a><small>© <span data-year>2026</span> Deadlock</small></div></footer>
+  <dialog class="project-gallery" id="project-gallery" aria-labelledby="gallery-title">
+    <header class="gallery-header">
+      <h2 id="gallery-title">TechPro App</h2>
+      <button class="gallery-control gallery-close" type="button" aria-label="Fechar prévia" autofocus>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <img class="gallery-image" src="assets/projects/techpro-app.webp" alt="Tela de login do TechPro App" width="1440" height="900" loading="lazy" decoding="async">
+    <footer class="gallery-footer">
+      <button class="gallery-control gallery-previous" type="button" aria-label="Ver projeto anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Anterior</span>
+      </button>
+      <span id="gallery-count" class="gallery-count" aria-live="polite" aria-atomic="true">1 de 2</span>
+      <button class="gallery-control gallery-next" type="button" aria-label="Ver próximo projeto">
+        <span>Próximo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+      </button>
+    </footer>
+  </dialog>
 </body>
 </html>

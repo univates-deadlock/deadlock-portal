@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/deadlock-mark.svg" alt="Deadlock — cadeado" width="100">
+  <img src="assets/deadlock-logo.png" alt="Logo da Deadlock" width="100">
   <h1>Deadlock — Portal</h1>
   <p>Portal de entrada da equipe Deadlock · Projetos, pessoas e código</p>
   <p><strong>Engenharia de Software · Univates · 2026B</strong></p>
@@ -15,9 +15,15 @@ O **Deadlock Portal** é a landing page da equipe responsável pelo projeto acad
 - [TechPro Institutional Page](https://github.com/univates-deadlock/techpro-institutional-page) — site institucional da empresa [TechPro](https://techpro.matbdev.com).
 - [GitHub Deadlock](https://github.com/univates-deadlock) — organização da equipe.
 
-A landing page é **100% estática**: HTML sem framework, CSS e JavaScript puro; sem dependências npm, backend, banco de dados ou etapa de build. As prévias visuais dos dois projetos são **ilustrações conceituais**, não capturas reais dos sistemas nem métricas de produção.
+A landing page é **100% estática**: HTML sem framework, CSS e JavaScript puro; sem dependências npm, backend, banco de dados ou etapa de build. As prévias mostram **capturas reais** da tela de login do TechPro App e do site institucional publicado. Clique em cada imagem para ampliá-la.
 
-> **Identidade visual:** `assets/deadlock-mark.svg` é uma marca vetorial provisória no estilo cadeado, pois o arquivo original da logo Deadlock não estava disponível ao montar este repositório. Para usar a logo já aprovada pelo grupo, substitua o arquivo mantendo o nome e ajuste os favicons conforme necessário.
+As capturas abrem uma galeria na própria página, com navegação por botões ou
+pelas setas do teclado. Feche com `Esc`, pelo botão de fechar ou clicando fora
+da imagem. Sem JavaScript, as imagens continuam abrindo diretamente em outra
+aba. Cards, fotos, links e botões têm estados de hover, foco e clique; os
+movimentos respeitam a preferência de movimento reduzido do dispositivo.
+
+> **Identidade visual:** `assets/deadlock-logo.png` é a imagem usada pela organização [univates-deadlock no GitHub](https://github.com/univates-deadlock). A mesma logo aparece no cabeçalho, destaque inicial, rodapé, página 404, favicon e imagem de compartilhamento. As fotos da equipe também vêm dos perfis confirmados nos commits. Todas as imagens são servidas localmente, sem consultar a API do GitHub durante a navegação. Veja as [fontes dos assets e como atualizar as capturas](docs/asset-sources.md).
 
 ## Estrutura
 
@@ -27,8 +33,12 @@ A landing page é **100% estática**: HTML sem framework, CSS e JavaScript puro;
 ├── 404.html                    # Página de erro para Caddy
 ├── css/style.css              # Layout, tokens e responsividade
 ├── js/main.js                 # Menu mobile, ano e reveal discreto
-├── assets/                    # Marca, favicon e imagem de compartilhamento
+├── js/gallery.js              # Galeria acessível das capturas reais
+├── css/interactions.css       # Hovers, foco, feedback e estilo da galeria
+├── assets/                    # Logo, favicon, capa, fotos da equipe e capturas
+├── docs/asset-sources.md       # Origem das imagens e atualização das capturas
 ├── tests/check_site.py        # Validação de referências locais
+├── tests/check_interactions.cjs # Verificação opcional no navegador
 ├── .github/workflows/
 │   ├── ci.yml                 # Validação e smoke test do container
 │   └── deploy.yml             # Deploy SSH na VM a partir da main
@@ -59,6 +69,29 @@ docker compose logs -f web
 ```
 
 A URL local com Docker é **http://127.0.0.1:8081/**. O Caddy dentro do container escuta na porta **8080**, mapeada apenas para o loopback da VM. Não use `8080:8080` no host: a aplicação institucional TechPro já usa a porta 8080; a mesma VM também já utiliza 80/443.
+
+## Validar as interações
+
+A validação básica não precisa de dependências:
+
+```bash
+python3 tests/check_site.py
+node --check js/main.js
+node --check js/gallery.js
+```
+
+O teste opcional de navegador usa Playwright como ferramenta de desenvolvimento;
+não adiciona dependências à página. Com o portal rodando, execute:
+
+```bash
+npm install --prefix /tmp/deadlock-browser-check --no-save playwright
+/tmp/deadlock-browser-check/node_modules/.bin/playwright install chromium
+PLAYWRIGHT_MODULE=/tmp/deadlock-browser-check/node_modules/playwright node tests/check_interactions.cjs http://127.0.0.1:8081
+```
+
+O teste cobre a galeria, navegação por teclado, foco, bloqueio de rolagem,
+fechamento por botão/Esc/clique fora, preferência de movimento reduzido,
+telas de 320/390/1440 pixels e abertura das capturas sem JavaScript.
 
 ## CI/CD — GitHub Actions → VM da Univates
 
@@ -149,7 +182,7 @@ Se o deploy falhar, consulte **Actions → CD — Deploy Deadlock Portal**, conf
 
 - [Alexandra Padilha](https://github.com/alexandrapadilha1) — frontend e site institucional.
 - [Diogo Felipe Zanco](https://github.com/DiogoFZanco) — frontend.
-- [Mateus Carniel Brambilla](https://github.com/matbdev) — backend e infraestrutura.
+- [Mateus Carniel Brambilla](https://github.com/matbdev) — DevOps, backend e infraestrutura.
 - [Tainá Luiza Schmidt](https://github.com/TainaSchmidt) — backend.
 
 As atribuições refletem o escopo do projeto acadêmico, não cargos profissionais.

@@ -19,7 +19,9 @@ jobs:
         run: python3 tests/check_site.py
 
       - name: Check JavaScript syntax
-        run: node --check js/main.js
+        run: |
+          node --check js/main.js
+          node --check js/gallery.js
 
       - name: Validate Compose file
         run: docker compose config --quiet

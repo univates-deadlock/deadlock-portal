@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <title>Símbolo geométrico de cadeado Deadlock</title>
-  <path d="M37 54V42C37 27.1 49.1 15 64 15S91 27.1 91 42V54" stroke="#C6BAFF" stroke-width="9" stroke-linecap="round"/>
-  <rect x="23" y="52" width="82" height="63" rx="15" fill="#B7ACFF"/>
-  <path d="M64 68C56.2 68 50 74.2 50 82C50 87.1 52.8 91.5 57 93.9V102H71V93.9C75.2 91.5 78 87.1 78 82C78 74.2 71.8 68 64 68Z" fill="#21182F"/>
-</svg>
