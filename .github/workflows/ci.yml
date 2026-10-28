@@ -34,7 +34,9 @@ jobs:
           set -Eeuo pipefail
           curl --fail --silent --show-error http://127.0.0.1:8081/health | grep -qx 'ok'
           curl --fail --silent --show-error http://127.0.0.1:8081/ | grep -q 'Deadlock'
-          curl --fail --silent --show-error http://127.0.0.1:8081/css/style.css > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8081/css/variables.css > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8081/css/global.css > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8081/css/pages/home.css > /dev/null
           test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/not-a-real-page)" = '404'
 
       - name: Diagnostics on failure
